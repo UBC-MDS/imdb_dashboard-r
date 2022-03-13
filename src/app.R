@@ -1,31 +1,62 @@
 library(dash)
-library(dashBootstrapComponents)
-library(dashCoreComponents)
+library(dashHtmlComponents)
 library(ggplot2)
 library(plotly)
 library(purrr)
-library(dashHtmlComponents)
 
-imdb <- read.csv("data/imdb_2011-2020.csv")
+source("src/bar_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
+imdb <- read.csv("data/imdb_2011-2020.csv")
+
+selected_genres <- as.list(unique(imdb$genres))
+
 # Set the layout of the app
 app %>% set_layout(
-  h1("IMDb Dashboard"),
-  h4("Plan your next movie."),
-  div(
+  htmlH1("IMDb Dashboard",
+     style = list(
+       textAlign = "center",
+       color = "#DBA506"
+     )),
+  htmlH4("Plan your next movie.",
+     style = list(
+       textAlign = "center",
+       color = "#DBA506"
+     )),
+  htmlDiv(
     dbcRow(
       list(
         dbcCol(
           list(
-            htmlLabel(
-              "Top N (actors)",
+            htmlStrong(
+              htmlDiv(
+                "Select Genre(s):",
+                style = list(
+                  width = "100%",
+                  background = "#DBA506",
+                  color = "#000000"
+                  ) 
+                )
+              ),
+            dbcChecklist(
+              id = "genre_list",
+              options = levels(factor(imdb$genres))%>%
+                          purrr::map(function(col) list(label = col, value = col)),
+              value = list("Action", "Horror", "Romance"),
               style = list(
                 width = "100%",
-                textAlign = "center",
-                background = "#DBA506",
-                color = "#000000"
+                "color" = "#DBA506"
+                )
+            ),
+            htmlStrong(
+              htmlDiv(
+                "Top N (actors)",
+                style = list(
+                  width = "100%",
+                  background = "#DBA506",
+                  color = "#000000"
+                  )
                 )
               ),
             dccSlider(
@@ -38,42 +69,60 @@ app %>% set_layout(
                 "5" = "5",
                 "10" = "10",
                 "15" = "15"
-              ),
+                ),
               value = 10
-            )
-          ),
+              )
+            ),
           width = 1
-        ),
+          ),
         dbcCol(
           list(
             dbcRow(
               list(
-                htmlLabel(
+                htmlStrong(
                   children=list(
-                    "Top N Actors from the best rated movies"
+                    "Top ",
+                    htmlDiv(id="top_n_value",
+                            style=list(display="inline")),
+                    " Actors from the best rated movies"
                     ),
                   style = list(
                     width = "100%",
+                    font_weight = "bold",
                     textAlign = "center",
                     background = "#DBA506",
                     color = "#000000"
+                    )
                   )
+                )
+              ),
+            dbcRow(
+              list(
+                dccGraph(
+                  id="plot-area",
+                  style = list(
+                    width = "100%",
+                    height = "100%", 
+                    border = "1px solid gold"
+                  )
+                  )   
                 )
               )
             ),
-            dbcRow(
-              list(
-                dccGraph(id="plot-area")   
-              )
-            )
-          ),
           width = 4
+          )
         )
-      ) 
+      )
     )
   )
-)
 
+app$callback(
+  output("top_n_value", "children"),
+  list(input("top_n", "value")),
+  function(top_n){
+    top_n
+  }  
+)
 
 app$callback(
   output("plot-area", "figure"),
@@ -88,29 +137,7 @@ app$callback(
       arrange(desc(rating)) %>% 
       head(top_n)
     
-    p <- ggplot(
-      data = actors,
-      aes(x = rating,
-          y = reorder(primaryName, rating))) +
-      geom_col(fill = "#DBA506") +
-      geom_text(aes(label = rating),
-                nudge_x = -0.3,
-                colour = "white") +
-      labs(x = "Average Movie Rating",
-           y = "") +
-      ggthemes::scale_color_tableau()
-
-    p <- p + theme(panel.background = element_rect(fill = "black"),
-                   plot.background = element_rect(fill = "black"),
-                   panel.border = element_blank(),
-                   panel.grid.major = element_blank(),
-                   panel.grid.minor = element_blank(),
-                   axis.line = element_line(size = 0.5, linetype = "solid",
-                                            colour = "white"),
-                   axis.text = element_text(colour = "white"),
-                   axis.title = element_text(colour = "white") 
-                   )
-  ggplotly(p)
+    generate_bar_chart(actors, top_n) 
   }
 )
 
