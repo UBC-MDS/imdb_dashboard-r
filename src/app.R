@@ -61,28 +61,6 @@ app %>% set_layout(
           )
         )
       ),
-      htmlDiv(
-        dbcRow(
-          list(
-            dbcCol(
-              list(
-                htmlDiv(
-                  htmlH6(
-                    "Total Movies",
-                    style = list(width = "100%", background = "#DBA506")
-                  )
-                ),
-                htmlDiv(
-                  htmlH2(
-                    children = list(htmlDiv(id = "total_movies", style = list(display="inline"))),
-                    style = list(width = "100%", background = "#DBA506")
-                  )
-                )
-              )
-            )
-          )
-        )
-      ),
       htmlImg(
         src = "assets/reel.png",
         id = "image",
@@ -139,22 +117,22 @@ app %>% set_layout(
                       list(
                         dbcRow(
                           list(
-                            htmlDiv(
-                              htmlH6(
+                            htmlStrong(
+                              htmlDiv(
                                 "Total Movies",
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
                               htmlH2(
-                                children = list(htmlDiv(id = "total_movies1", style = list(display="inline"))),
+                                children = list(htmlDiv(id = "total_movies", style = list(display="inline"))),
                                 style = list(width = "100%", background = "#DBA506")
                               )
                             ),
-                            htmlDiv(
-                              htmlH6(
+                            htmlStrong(
+                              htmlDiv(
                                 "Total Actors",
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
@@ -163,10 +141,10 @@ app %>% set_layout(
                                 style = list(width = "100%", background = "#DBA506")
                               )
                             ),
-                            htmlDiv(
-                              htmlH6(
+                            htmlStrong(
+                              htmlDiv(
                                 "Average Rating",
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
@@ -175,10 +153,10 @@ app %>% set_layout(
                                 style = list(width = "100%", background = "#DBA506")
                               )
                             ),
-                            htmlDiv(
-                              htmlH6(
+                            htmlStrong(
+                              htmlDiv(
                                 "Average Runtime",
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
@@ -194,10 +172,10 @@ app %>% set_layout(
                     ),
                     dbcCol(
                       list(
-                        htmlDiv(
-                          htmlH6(
+                        htmlStrong(
+                          htmlDiv(
                             "Distribution of Movies by Genre",
-                            style = list(width = "100%", background = "#DBA506")
+                            style = list(width = "100%", background = "#DBA506", color = "#000000")
                           )
                         ),
                         htmlDiv(
@@ -207,14 +185,14 @@ app %>% set_layout(
                           )
                         )
                       ),
-                      width = 4
+                      width = 5
                     ),
                     dbcCol(
                       list(
-                        htmlDiv(
-                          htmlH6(
+                        htmlStrong(
+                          htmlDiv(
                             "Average rating by Genre over Time",
-                            style = list(width = "100%", background = "#DBA506")
+                            style = list(width = "100%", background = "#DBA506", color = "#000000")
                           )
                         ),
                         htmlDiv(
@@ -224,7 +202,7 @@ app %>% set_layout(
                           )
                         )
                       ),
-                      width = 4
+                      width = 5
                     ) 
                   )
                 ),
@@ -233,35 +211,34 @@ app %>% set_layout(
                   list(
                     # Bar Chart
                     dbcCol(
-                      dbcRow(
-                        list(
-                          htmlStrong(
-                            children=list(
-                              "Top ",
-                              htmlDiv(id = "top_n_value",
-                                      style=list(display = "inline")),
-                              " Actors from the best rated movies"
-                            ),
-                            style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
-                          )
-                        )
-                      ),
-                      dbcRow(
-                        list(
-                          dccLoading(
-                            id = "loading-1",
-                            children = list(
-                              dccGraph(
-                                id = "plot-area"
+                      list(
+                        dbcRow(
+                          list(
+                            htmlStrong(
+                              htmlDiv(
+                                children=list(
+                                  "Top ",
+                                  htmlDiv(id = "top_n_value",
+                                          style=list(display = "inline")),
+                                  " Actors from the best rated movies"
+                                ),
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000") 
                               )
                             ),
-                            type = "circle",
-                            style = list(width = "100%")
+                            dccLoading(
+                              id = "loading-1",
+                              children = list(
+                                dccGraph(
+                                  id = "plot-area"
+                                )
+                              ),
+                              type = "circle",
+                              style = list(width = "100%")
+                            )
                           )
-                        ),
-                        style = list(width = "100%", border = "1px solid gold")
+                        )  
                       ),
-                    width = 4
+                      width = 4
                     )
                   )
                 )
