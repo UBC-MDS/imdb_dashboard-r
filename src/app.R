@@ -85,6 +85,23 @@ app %>% set_layout(
                   value = list("Action", "Horror", "Romance"),
                   style = list(width = "100%", "color" = "#DBA506")
                 ),
+                htmlBr(),
+                htmlStrong(
+                  htmlDiv(
+                    "Select Region(s):",
+                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                  )
+                ),
+                dccDropdown(
+                  id = "region_list",
+                  options = levels(factor(imdb$region))%>%
+                    purrr::map(function(col) list(label = col, value = col)),
+                  value = list("US", "IN"),
+                  multi = TRUE,
+                  clearable = FALSE,
+                  style = list(width = "100%", "color" = "#DBA506")
+                ),
+                htmlBr(),
                 htmlStrong(
                   htmlDiv(
                     "Top N (actors)",
@@ -102,7 +119,24 @@ app %>% set_layout(
                     "10" = "10",
                     "15" = "15"
                   ),
-                  value = 10
+                  value = 10,
+                  tooltip = list(placement = "bottom")
+                ),
+                htmlBr(),
+                htmlStrong(
+                  htmlDiv(
+                    "Year Range:",
+                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                  )
+                ),
+                dccRangeSlider(
+                  id = "year_range",
+                  min = 2011,
+                  max = 2020,
+                  step = 1,
+                  marks = list("2011" = "2011", "2020" = "2020"),
+                  value = list("2012", "2017"),
+                  tooltip = list(placement = "bottom")
                 )
               ),
               width = 2
