@@ -14,107 +14,154 @@ selected_genres <- as.list(unique(imdb$genres))
 
 # Set the layout of the app
 app %>% set_layout(
-  htmlH1("IMDb Dashboard",
-     style = list(
-       textAlign = "center",
-       color = "#DBA506"
-     )),
-  htmlH4("Plan your next movie.",
-     style = list(
-       textAlign = "center",
-       color = "#DBA506"
-     )),
-  htmlDiv(
-    dbcRow(
-      list(
-        dbcCol(
+  dbcContainer(
+    list(
+      htmlDiv(
+        dbcRow(
           list(
-            htmlStrong(
-              htmlDiv(
-                "Select Genre(s):",
-                style = list(
-                  width = "100%",
-                  background = "#DBA506",
-                  color = "#000000"
-                  ) 
-                )
-              ),
-            dbcChecklist(
-              id = "genre_list",
-              options = levels(factor(imdb$genres))%>%
-                          purrr::map(function(col) list(label = col, value = col)),
-              value = list("Action", "Horror", "Romance"),
-              style = list(
-                width = "100%",
-                "color" = "#DBA506"
-                )
-            ),
-            htmlStrong(
-              htmlDiv(
-                "Top N (actors)",
-                style = list(
-                  width = "100%",
-                  background = "#DBA506",
-                  color = "#000000"
-                  )
-                )
-              ),
-            dccSlider(
-              id = "top_n",
-              min = 1,
-              max = 15,
-              step = 1,
-              marks = list(
-                "1" = "1",
-                "5" = "5",
-                "10" = "10",
-                "15" = "15"
-                ),
-              value = 10
-              )
-            ),
-          width = 1
-          ),
-        dbcCol(
-          list(
-            dbcRow(
+            dbcCol(
               list(
-                htmlStrong(
-                  children=list(
-                    "Top ",
-                    htmlDiv(id="top_n_value",
-                            style=list(display="inline")),
-                    " Actors from the best rated movies"
+                htmlImg(
+                  src = "assets/projector.gif",
+                  id = "r",
+                  width = "100%"
+                  )
+                ),
+              width = 1
+              ),
+            dbcCol(
+              htmlStrong(
+                children=list(
+                  htmlDiv(
+                    "IMDb Dashboard",
+                    style = list(fontSize = 50, textAlign = "right", display="inline", color = "#DBA506")
                     ),
-                  style = list(
-                    width = "100%",
-                    font_weight = "bold",
-                    textAlign = "center",
-                    background = "#DBA506",
-                    color = "#000000"
+                  htmlDiv(
+                    "-------------------------------------------------------------------------------",
+                    style = list(fontSize = 20, textAlign = "right", display="inline", color = "#000000")
+                  ),
+                  htmlDiv(
+                    "Plan your next movie.",
+                    style = list(fontSize = 20, textAlign = "right", display="inline", color = "#F2DB83")
+                    )
+                ),
+                style = list(width = "100%", verticalAlign = "bottom", borderBottom = "2px solid gold")
+              # children=list(
+              #     htmlH1(
+              #       "IMDb Dashboard",
+              #       style = list(textAlign = "left", color = "#DBA506")
+              #       ),
+              #     htmlH5(
+              #       "Plan your next movie.",
+              #       style = list(textAlign = "right", color = "#F2DB83", borderBottom = "2px solid gold")
+              #     )
+                ),
+              width = 11
+              )
+            )
+          )
+        ),
+      htmlDiv(
+        dbcRow(
+          list(
+            dbcCol(
+              list(
+                htmlDiv(
+                  htmlH6(
+                    "Total Movies",
+                    style = list(width = "100%", background = "#DBA506")
+                    )
+                  ),
+                htmlDiv(
+                  htmlH2(
+                    children = list(htmlDiv(id = "total_movies", style = list(display="inline"))),
+                    style = list(width = "100%", background = "#DBA506")
                     )
                   )
                 )
-              ),
-            dbcRow(
-              list(
-                dccGraph(
-                  id="plot-area",
-                  style = list(
-                    width = "100%",
-                    height = "100%", 
-                    border = "1px solid gold"
-                  )
-                  )   
-                )
               )
+            )
+          )
+        ),
+      htmlImg(
+        src = "assets/reel.png",
+        id = "image",
+        width = "100%",
+        style = list(width = "100%", height = "200px", background = "#DBA506")
+        ),
+      htmlDiv(
+        dbcRow(
+          list(
+            dbcCol(
+              list(
+                htmlStrong(
+                  htmlDiv(
+                    "Select Genre(s):",
+                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    )
+                  ),
+                dbcChecklist(
+                  id = "genre_list",
+                  options = levels(factor(imdb$genres))%>%
+                    purrr::map(function(col) list(label = col, value = col)),
+                  value = list("Action", "Horror", "Romance"),
+                  style = list(width = "100%", "color" = "#DBA506")
+                  ),
+                htmlStrong(
+                  htmlDiv(
+                    "Top N (actors)",
+                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    )
+                  ),
+                dccSlider(
+                  id = "top_n",
+                  min = 1,
+                  max = 15,
+                  step = 1,
+                  marks = list(
+                    "1" = "1",
+                    "5" = "5",
+                    "10" = "10",
+                    "15" = "15"
+                    ),
+                  value = 10
+                  )
+                ),
+              width = 1
             ),
-          width = 4
+            dbcCol(
+              list(
+                dbcRow(
+                  list(
+                    htmlStrong(
+                      children=list(
+                        "Top ",
+                        htmlDiv(id = "top_n_value",
+                                style=list(display = "inline")),
+                        " Actors from the best rated movies"
+                        ),
+                      style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
+                      )
+                    )
+                  ),
+                dbcRow(
+                  list(
+                    dccGraph(
+                      id="plot-area",
+                      style = list(width = "100%", height = "100%", border = "1px solid gold")
+                      )   
+                    )
+                  )
+                ),
+              width = 4
+              )
+            )
           )
         )
       )
     )
   )
+
 
 app$callback(
   output("top_n_value", "children"),
@@ -126,10 +173,11 @@ app$callback(
 
 app$callback(
   output("plot-area", "figure"),
-  list(input("top_n", "value")),
-  function(top_n) {
+  list(input("top_n", "value"),
+       input("genre_list", "value")),
+  function(top_n, genre_list) {
     actors <- imdb %>%
-      filter(genres %in% c("Action", "Horror", "Thriller"),
+      filter(genres %in% genre_list,
              region %in% c("US", "IN")) %>%
       select(averageRating, primaryName) %>% 
       group_by(primaryName) %>% 
