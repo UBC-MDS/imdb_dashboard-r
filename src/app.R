@@ -1,8 +1,8 @@
 library(dash)
 library(dashHtmlComponents)
-library(ggplot2)
+library(tidyverse)
 library(plotly)
-library(purrr)
+library(jsonlite)
 
 source("src/bar_chart.R")
 
@@ -14,6 +14,7 @@ selected_genres <- as.list(unique(imdb$genres))
 
 # Set the layout of the app
 app %>% set_layout(
+  dccStore(id = "filtered_data"),
   dbcContainer(
     list(
       htmlDiv(
@@ -248,6 +249,7 @@ app %>% set_layout(
                       list(
                         dbcRow(
                           list(
+                            # Bar Chart Title
                             htmlStrong(
                               htmlDiv(
                                 children=list(
@@ -259,15 +261,21 @@ app %>% set_layout(
                                 style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000") 
                               )
                             ),
-                            dccLoading(
-                              id = "loading-1",
-                              children = list(
-                                dccGraph(
-                                  id = "plot-area"
-                                )
-                              ),
-                              type = "circle",
-                              style = list(width = "100%")
+                            # Bar Chart Plot
+                            dbcCol(
+                              htmlDiv(
+                                dccLoading(
+                                  id = "loading-1",
+                                  children = list(
+                                    dccGraph(
+                                      id = "plot-area"
+                                    )
+                                  ),
+                                  type = "circle",
+                                  style = list(width = "100%")
+                                ),
+                                style = list(width = "100%", border = "1px solid gold")
+                              ) 
                             )
                           )
                         )  
@@ -285,6 +293,19 @@ app %>% set_layout(
   )
 )
 
+app$callback(
+  output("filtered_data", "data"),
+  list(input("genre_list", "value"),
+       input("region_list", "value"),
+       input("year_range", "value")),
+  function(genre_list, region_list, year_range){
+    filtered_data <- imdb %>%
+      filter(genres %in% genre_list,
+             region %in% region_list,
+             between(startYear, year_range[1], year_range[2]))
+    jsonlite::toJSON(filtered_data)
+  }  
+)
 
 app$callback(
   output("top_n_value", "children"),
@@ -296,19 +317,12 @@ app$callback(
 
 app$callback(
   output("plot-area", "figure"),
-  list(input("top_n", "value"),
-       input("genre_list", "value")),
-  function(top_n, genre_list) {
-    actors <- imdb %>%
-      filter(genres %in% genre_list,
-             region %in% c("US", "IN")) %>%
-      select(averageRating, primaryName) %>% 
-      group_by(primaryName) %>% 
-      summarise(rating = mean(averageRating)) %>% 
-      arrange(desc(rating)) %>% 
-      head(top_n)
-    
-    generate_bar_chart(actors, top_n) 
+  list(input("filtered_data", "data"),
+       input("top_n", "value")),
+  function(data, top_n) {
+    df <- jsonlite::fromJSON(data)
+    figure <- generate_bar_chart(df, top_n)
+    figure
   }
 )
 
