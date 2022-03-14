@@ -76,7 +76,7 @@ app %>% set_layout(
                 htmlStrong(
                   htmlDiv(
                     "Select Genre(s):",
-                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                   )
                 ),
                 dbcChecklist(
@@ -90,7 +90,7 @@ app %>% set_layout(
                 htmlStrong(
                   htmlDiv(
                     "Select Region(s):",
-                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                   )
                 ),
                 dccDropdown(
@@ -107,7 +107,7 @@ app %>% set_layout(
                 htmlStrong(
                   htmlDiv(
                     "Top N (actors)",
-                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                   )
                 ),
                 dccSlider(
@@ -128,7 +128,7 @@ app %>% set_layout(
                 htmlStrong(
                   htmlDiv(
                     "Year Range:",
-                    style = list(width = "100%", background = "#DBA506", color = "#000000")
+                    style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                   )
                 ),
                 dccRangeSlider(
@@ -157,7 +157,7 @@ app %>% set_layout(
                             htmlStrong(
                               htmlDiv(
                                 "Total Movies",
-                                style = list(width = "100%", background = "#DBA506", color = "#000000")
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
@@ -169,7 +169,7 @@ app %>% set_layout(
                             htmlStrong(
                               htmlDiv(
                                 "Total Actors",
-                                style = list(width = "100%", background = "#DBA506", color = "#000000")
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
@@ -180,26 +180,29 @@ app %>% set_layout(
                             ),
                             htmlStrong(
                               htmlDiv(
+                                "Average Runtime",
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
+                              )
+                            ),
+                            htmlDiv(
+                              htmlH2(
+                                children = list(
+                                  htmlDiv(id = "avg_runtime", style = list(display="inline")),
+                                  htmlDiv("mins", style = list(fontSize = 20, display="inline"))
+                                  ),
+                                style = list(width = "100%", textAlign = "center", background = "#000000", color = "#F2DB83", border = "1px solid gold")
+                              )
+                            ),
+                            htmlStrong(
+                              htmlDiv(
                                 "Average Rating",
-                                style = list(width = "100%", background = "#DBA506", color = "#000000")
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                               )
                             ),
                             htmlDiv(
                               htmlH2(
                                 children = list(htmlDiv(id = "avg_rating", style = list(display="inline"))),
-                                style = list(width = "100%", background = "#DBA506")
-                              )
-                            ),
-                            htmlStrong(
-                              htmlDiv(
-                                "Average Runtime",
-                                style = list(width = "100%", background = "#DBA506", color = "#000000")
-                              )
-                            ),
-                            htmlDiv(
-                              htmlH2(
-                                children = list(htmlDiv(id = "avg_runtime", style = list(display="inline"))),
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", textAlign = "center", background = "#000000", color = "#F2DB83", border = "1px solid gold")
                               )
                             )
                           )
@@ -212,12 +215,12 @@ app %>% set_layout(
                         htmlStrong(
                           htmlDiv(
                             "Distribution of Movies by Genre",
-                            style = list(width = "100%", background = "#DBA506", color = "#000000")
+                            style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                           )
                         ),
                         htmlDiv(
                           htmlH2(
-                            children = list(htmlDiv(id = "total_movies2", style = list(display="inline"))),
+                            children = list(htmlDiv(id = "box_plot", style = list(display="inline"))),
                             style = list(width = "100%", background = "#DBA506")
                           )
                         )
@@ -229,7 +232,7 @@ app %>% set_layout(
                         htmlStrong(
                           htmlDiv(
                             "Average rating by Genre over Time",
-                            style = list(width = "100%", background = "#DBA506", color = "#000000")
+                            style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                           )
                         ),
                         htmlDiv(
@@ -337,8 +340,7 @@ app$callback(
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
-    movies <- n_distinct(df$primaryTitle, na.rm = TRUE)
-    movies
+    n_distinct(df$primaryTitle, na.rm = TRUE)
   }
 )
 
@@ -348,8 +350,27 @@ app$callback(
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
-    movies <- n_distinct(df$primaryName, na.rm = FALSE)
-    movies
+    n_distinct(df$primaryName, na.rm = FALSE)
+  }
+)
+
+# KPI: Average Runtime
+app$callback(
+  output("avg_runtime", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    round(mean(df$runtimeMinutes, na.rm = TRUE), 0)
+  }
+)
+
+# KPI: Average Rating
+app$callback(
+  output("avg_rating", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    round(mean(df$averageRating, na.rm = TRUE), 1)
   }
 )
 
