@@ -12,8 +12,9 @@ generate_line_chart <- function(df, ycol) {
     p <- ggplot(df) +
         aes(x = startYear,
             y = !!sym(ycol),
-            color = genres) +
-        geom_line(stat = "summary", fun = mean) +
+            color = genres,
+            text = startYear) +  # TODO: improve me but there's ggplot bugs
+        geom_line(stat = "summary", fun.y = mean) +
         labs(x = "Year", y = ylab)
     
     p <- p + theme(panel.background = element_rect(fill = "black"),
@@ -29,5 +30,5 @@ generate_line_chart <- function(df, ycol) {
                    axis.text = element_text(colour = "#DBA506"),
                    axis.title = element_text(colour = "#DBA506"))
     
-    ggplotly(p)  # Return
+    ggplotly(p, tooltip = "text")  # Return
 }
