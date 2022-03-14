@@ -5,6 +5,7 @@ library(plotly)
 library(jsonlite)
 
 source("src/bar_chart.R")
+source("src/line_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
@@ -237,7 +238,17 @@ app %>% set_layout(
                                 style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                               ),
                             ),
-                            dccGraph(id='line'),
+                            # Line chart
+                            dccLoading(
+                                id = "loading-line",
+                                children = list(
+                                    dccGraph(
+                                        id = "line"
+                                    )
+                                ),
+                                type = "circle",
+                                style = list(width = "100%")
+                            ),
                             dccRadioItems(
                                 id='ycol',
                                 options = list(
@@ -392,12 +403,8 @@ app$callback(
         input('ycol', 'value')),
     function(data, ycol) {
         df <- jsonlite::fromJSON(data)
-        p <- ggplot(df) +
-            aes(x = startYear,
-                y = !!sym(ycol),
-                color = genres) +
-            geom_line(stat = "summary", fun = mean)
-        ggplotly(p)  # Return
+        figure <- generate_line_chart(df, ycol)
+        figure
     }
 )
 
