@@ -31,7 +31,9 @@ generate_line_chart <- function(df, ycol) {
                                             linetype = "solid",
                                             colour = "white"),
                    axis.text = element_text(colour = "#DBA506"),
-                   axis.title = element_text(colour = "#DBA506"))
+                   axis.title = element_text(colour = "#DBA506"),
+                   legend.position = c(0.5, 0.5))
     
-    ggplotly(p, tooltip = "text")  # Return
+    ggplotly(p, tooltip = "text") |>
+        layout(legend = list(orientation = "h", y = -0.15))  # Return
 }
