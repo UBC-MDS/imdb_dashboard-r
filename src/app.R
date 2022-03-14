@@ -249,8 +249,16 @@ app %>% set_layout(
                                 type = "circle",
                                 style = list(width = "100%")
                             ),
+                            htmlH6("Select y-axis: ",
+                                   style = list(
+                                       width = "100%", color = "#000000", font_weight = "bold", background = "#DBA506"
+                                   )),
                             dccRadioItems(
-                                id='ycol',
+                                id = 'ycol',
+                                # BUG: none of this styling actually works
+                                style = list(width = "300px", height = "20px"),
+                                inputStyle = list(margin_right = "10px", margin_left = "10px"),
+                                inline = TRUE,
                                 options = list(
                                     list(label = "Average Rating", value = "averageRating"),
                                     list(label = "Average Runtime", value = "runtimeMinutes")), 
