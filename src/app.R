@@ -95,12 +95,13 @@ app %>% set_layout(
                 ),
                 dccDropdown(
                   id = "region_list",
-                  options = levels(factor(imdb$region))%>%
+                  options = levels(factor(na.omit(imdb$region)))%>%
                     purrr::map(function(col) list(label = col, value = col)),
                   value = list("US", "IN"),
                   multi = TRUE,
+                  placeholder = "All Regions",
                   clearable = FALSE,
-                  style = list(width = "100%", "color" = "#DBA506")
+                  style = list(width = "100%", background = "#000000", backgroundColor = "#000000", "color" = "#DBA506")
                 ),
                 htmlBr(),
                 htmlStrong(
@@ -174,7 +175,7 @@ app %>% set_layout(
                             htmlDiv(
                               htmlH2(
                                 children = list(htmlDiv(id = "total_actors", style = list(display="inline"))),
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", textAlign = "center", background = "#000000", color = "#F2DB83", border = "1px solid gold")
                               )
                             ),
                             htmlStrong(
@@ -336,7 +337,18 @@ app$callback(
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
-    movies <- length(unique(df$primaryTitle))
+    movies <- n_distinct(df$primaryTitle, na.rm = TRUE)
+    movies
+  }
+)
+
+# KPI: Total Actors
+app$callback(
+  output("total_actors", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    movies <- n_distinct(df$primaryName, na.rm = FALSE)
     movies
   }
 )
