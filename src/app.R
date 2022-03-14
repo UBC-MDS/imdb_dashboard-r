@@ -136,7 +136,7 @@ app %>% set_layout(
                   max = 2020,
                   step = 1,
                   marks = list("2011" = "2011", "2020" = "2020"),
-                  value = list("2012", "2017"),
+                  value = list("2011", "2020"),
                   tooltip = list(placement = "bottom")
                 )
               ),
@@ -148,6 +148,7 @@ app %>% set_layout(
                 # First row of charts
                 dbcRow(
                   list(
+                    # KPI
                     dbcCol(
                       list(
                         dbcRow(
@@ -161,7 +162,7 @@ app %>% set_layout(
                             htmlDiv(
                               htmlH2(
                                 children = list(htmlDiv(id = "total_movies", style = list(display="inline"))),
-                                style = list(width = "100%", background = "#DBA506")
+                                style = list(width = "100%", textAlign = "center", background = "#000000", color = "#F2DB83", border = "1px solid gold")
                               )
                             ),
                             htmlStrong(
@@ -293,6 +294,7 @@ app %>% set_layout(
   )
 )
 
+# Filter data based on inputs
 app$callback(
   output("filtered_data", "data"),
   list(input("genre_list", "value"),
@@ -307,6 +309,7 @@ app$callback(
   }  
 )
 
+# Top N Slider value for Bar Chart Title
 app$callback(
   output("top_n_value", "children"),
   list(input("top_n", "value")),
@@ -315,6 +318,7 @@ app$callback(
   }  
 )
 
+# Bar Chart Callback
 app$callback(
   output("plot-area", "figure"),
   list(input("filtered_data", "data"),
@@ -323,6 +327,17 @@ app$callback(
     df <- jsonlite::fromJSON(data)
     figure <- generate_bar_chart(df, top_n)
     figure
+  }
+)
+
+# KPI: Total Movies
+app$callback(
+  output("total_movies", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    movies <- length(unique(df$primaryTitle))
+    movies
   }
 )
 
