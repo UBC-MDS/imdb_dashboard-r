@@ -10,13 +10,19 @@ generate_line_chart <- function(df, ycol) {
     }
     
     df$startYear <- as.Date(paste(df$startYear, 1, 1, sep = "-"))
+    # Calculate the mean Y per genre per year
+    # this has to be done outside ggplot for the tooltip to work
+    df <- df |>
+        group_by(genres, startYear) |>
+        summarize(meanY = mean(!!sym(ycol), na.rm = TRUE)) |>
+        merge(df)
     
     p <- ggplot(df) +
         aes(x = startYear,
-            y = !!sym(ycol),
+            y = meanY,
             color = genres,
-            text = startYear) +  # TODO: improve me but there's ggplot bugs
-        geom_line(stat = "summary", fun.y = mean) +
+            text = meanY) +  # TODO: improve me but there's ggplot bugs
+        geom_line() +
         labs(x = "Year", y = ylab) +
         scale_x_date(date_labels = "%Y")
     
