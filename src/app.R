@@ -229,17 +229,28 @@ app %>% set_layout(
                     ),
                     dbcCol(
                       list(
-                        htmlStrong(
-                          htmlDiv(
-                            "Average rating by Genre over Time",
-                            style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
-                          )
-                        ),
-                        htmlDiv(
-                          htmlH2(
-                            children = list(htmlDiv(id = "total_movies3", style = list(display="inline"))),
-                            style = list(width = "100%", background = "#DBA506")
-                          )
+                        dbcRow(
+                            list(
+                            htmlStrong(
+                              htmlDiv(
+                                "Average rating by Genre over Time",
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
+                              ),
+                            ),
+                            dccGraph(id='line'),
+                            dccRadioItems(
+                                id='ycol',
+                                options = list(
+                                    list(label = "Average Rating", value = "averageRating"),
+                                    list(label = "Average Runtime", value = "runtimeMinutes")), 
+                                value='averageRating'),
+                            htmlDiv(
+                              htmlH2(
+                                children = list(htmlDiv(id = "total_movies3", style = list(display="inline"))),
+                                style = list(width = "100%", background = "#DBA506")
+                              )
+                            )
+                        )
                         )
                       ),
                       width = 5
@@ -372,6 +383,22 @@ app$callback(
     df <- jsonlite::fromJSON(data)
     round(mean(df$averageRating, na.rm = TRUE), 1)
   }
+)
+
+# Line plot
+app$callback(
+    output('line', 'figure'),
+    list(input("filtered_data", "data"),
+        input('ycol', 'value')),
+    function(data, ycol) {
+        df <- jsonlite::fromJSON(data)
+        p <- ggplot(df) +
+            aes(x = startYear,
+                y = !!sym(ycol),
+                color = genres) +
+            geom_line(stat = "summary", fun = mean)
+        ggplotly(p)  # Return
+    }
 )
 
 app$run_server(Debug=T)
