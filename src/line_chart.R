@@ -9,13 +9,16 @@ generate_line_chart <- function(df, ycol) {
         ylab <- "Average Runtime (minutes)"
     }
     
+    df$startYear <- as.Date(paste(df$startYear, 1, 1, sep = "-"))
+    
     p <- ggplot(df) +
         aes(x = startYear,
             y = !!sym(ycol),
             color = genres,
             text = startYear) +  # TODO: improve me but there's ggplot bugs
         geom_line(stat = "summary", fun.y = mean) +
-        labs(x = "Year", y = ylab)
+        labs(x = "Year", y = ylab) +
+        scale_x_date(date_labels = "%Y")
     
     p <- p + theme(panel.background = element_rect(fill = "black"),
                    plot.background = element_rect(fill = "black"),
