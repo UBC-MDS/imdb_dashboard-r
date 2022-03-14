@@ -282,7 +282,7 @@ app %>% set_layout(
                                 children=list(
                                   "Top ",
                                   htmlDiv(id = "top_n_value",
-                                          style=list(display = "inline")),
+                                          style=list(display = "inline")),  # BUG: this doesn't work on initial load
                                   " Actors from the best rated movies"
                                 ),
                                 style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000") 
