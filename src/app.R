@@ -317,7 +317,7 @@ app$callback(
 app$callback(
   output("top_n_value", "children"),
   list(input("top_n", "value")),
-  function(top_n){
+  function(top_n=10){
     top_n
   }  
 )
