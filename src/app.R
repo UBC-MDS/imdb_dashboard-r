@@ -4,12 +4,13 @@ library(tidyverse)
 library(plotly)
 library(jsonlite)
 
-source("src/bar_chart.R")
-source("src/line_chart.R")
+source("bar_chart.R")
+source("boxplot.R")
+source("line_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
-imdb <- read.csv("data/imdb_2011-2020.csv")
+imdb <- read.csv("../data/imdb_2011-2020.csv")
 
 selected_genres <- as.list(unique(imdb$genres))
 
@@ -219,6 +220,17 @@ app %>% set_layout(
                             style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
                           )
                         ),
+                        # boxplot
+                            dccLoading(
+                                id = "loading-2",
+                                children = list(
+                                    dccGraph(
+                                        id = "boxplot"
+                                    )
+                                ),
+                                type = "circle",
+                                style = list(width = "100%")
+                            ),####
                         htmlDiv(
                           htmlH2(
                             children = list(htmlDiv(id = "box_plot", style = list(display="inline"))),
@@ -403,6 +415,17 @@ app$callback(
   function(data) {
     df <- jsonlite::fromJSON(data)
     round(mean(df$averageRating, na.rm = TRUE), 1)
+  }
+)
+      
+# Boxplot Callback
+app$callback(
+  output("boxplot", "figure"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    figure <- generate_boxplot(df)
+    figure
   }
 )
 
