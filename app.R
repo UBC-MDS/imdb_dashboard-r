@@ -10,7 +10,7 @@ source("line_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
-imdb <- read.csv("../data/imdb_2011-2020.csv")
+imdb <- read.csv("data/imdb_2011-2020.csv")
 
 selected_genres <- as.list(unique(imdb$genres))
 
