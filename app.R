@@ -1,6 +1,6 @@
 library(dash)
 library(dashHtmlComponents)
-library(tidyverse)
+library(dplyr)
 library(plotly)
 library(jsonlite)
 
