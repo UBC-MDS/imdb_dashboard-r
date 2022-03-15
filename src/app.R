@@ -5,6 +5,7 @@ library(plotly)
 library(jsonlite)
 
 source("src/bar_chart.R")
+source("src/line_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
@@ -229,17 +230,48 @@ app %>% set_layout(
                     ),
                     dbcCol(
                       list(
-                        htmlStrong(
-                          htmlDiv(
-                            "Average rating by Genre over Time",
-                            style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
-                          )
-                        ),
-                        htmlDiv(
-                          htmlH2(
-                            children = list(htmlDiv(id = "total_movies3", style = list(display="inline"))),
-                            style = list(width = "100%", background = "#DBA506")
-                          )
+                        dbcRow(
+                            list(
+                            htmlStrong(
+                              htmlDiv(
+                                "Average rating by Genre over Time",
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000")
+                              ),
+                            ),
+                            # Line chart
+                            dccLoading(
+                                id = "loading-line",
+                                children = list(
+                                    dccGraph(
+                                        id = "line"
+                                    )
+                                ),
+                                type = "circle",
+                                style = list(width = "100%")
+                            ),
+                            dbcRow(list(
+                                htmlH6("Select y-axis: ",
+                                       style = list(
+                                           width = "120px", color = "#000000", font_weight = "bold", background = "#DBA506"
+                                       )),
+                                dccRadioItems(
+                                    id = 'ycol',
+                                    # BUG: none of this styling actually works
+                                    style = list(width = "300px", height = "20px"),
+                                    inputStyle = list(margin_right = "10px", margin_left = "10px"),
+                                    inline = TRUE,
+                                    options = list(
+                                        list(label = "Average Rating", value = "averageRating"),
+                                        list(label = "Average Runtime", value = "runtimeMinutes")), 
+                                    value='averageRating')
+                            )),
+                            htmlDiv(
+                              htmlH2(
+                                children = list(htmlDiv(id = "total_movies3", style = list(display="inline"))),
+                                style = list(width = "100%", background = "#DBA506")
+                              )
+                            )
+                        )
                         )
                       ),
                       width = 5
@@ -260,7 +292,7 @@ app %>% set_layout(
                                 children=list(
                                   "Top ",
                                   htmlDiv(id = "top_n_value",
-                                          style=list(display = "inline")),
+                                          style=list(display = "inline")),  # BUG: this doesn't work on initial load
                                   " Actors from the best rated movies"
                                 ),
                                 style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000") 
@@ -372,6 +404,18 @@ app$callback(
     df <- jsonlite::fromJSON(data)
     round(mean(df$averageRating, na.rm = TRUE), 1)
   }
+)
+
+# Line plot
+app$callback(
+    output('line', 'figure'),
+    list(input("filtered_data", "data"),
+        input('ycol', 'value')),
+    function(data, ycol) {
+        df <- jsonlite::fromJSON(data)
+        figure <- generate_line_chart(df, ycol)
+        figure
+    }
 )
 
 app$run_server(Debug=T)
