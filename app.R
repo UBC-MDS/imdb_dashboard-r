@@ -29,42 +29,112 @@ app %>% set_layout(
               width = 1
             ),
             dbcCol(
-              htmlStrong(
-                children=list(
+              htmlDiv(
+                children = list(
                   htmlDiv(
                     "IMDb Dashboard",
-                    style = list(fontSize = 50, textAlign = "right", display="inline", color = "#DBA506")
-                  ),
-                  htmlDiv(
-                    "-------------------------------------------------------------------------------",
-                    style = list(fontSize = 20, textAlign = "right", display="inline", color = "#000000")
+                    style = list(fontSize = 50, display="inline", color = "#DBA506")
                   ),
                   htmlDiv(
                     "Plan your next movie.",
-                    style = list(fontSize = 20, textAlign = "right", display="inline", color = "#F2DB83")
+                    style = list(fontSize = 20, display="flex", position = "absolute", top = 30, right = 0, color = "#F2DB83")
                   )
                 ),
-                style = list(width = "100%", verticalAlign = "bottom", borderBottom = "2px solid gold")
-                # children=list(
-                #     htmlH1(
-                #       "IMDb Dashboard",
-                #       style = list(textAlign = "left", color = "#DBA506")
-                #       ),
-                #     htmlH5(
-                #       "Plan your next movie.",
-                #       style = list(textAlign = "right", color = "#F2DB83", borderBottom = "2px solid gold")
-                #     )
+                style = list(width = "100%", position = "relative", verticalAlign = "bottom")
               ),
               width = 11
             )
           )
         )
       ),
-      htmlImg(
-        src = "assets/reel.png",
-        id = "image",
-        width = "100%",
-        style = list(width = "100%", height = "200px", background = "#DBA506")
+      htmlDiv(
+        children = list(
+          htmlImg(
+            src = "assets/reel.png",
+            id = "image",
+            width = "100%",
+            style = list(width = "100%", height = "200px", background = "#DBA506")
+          ),
+          htmlDiv(
+            dbcRow(
+              list(
+                htmlStrong(
+                  htmlDiv(
+                    "Total Movies",
+                    style = list(fontSize = 20, display="flex", position = "absolute", top = 50, left = 100, textAlign = "center", color = "#000000")
+                  )
+                ),
+                htmlDiv(
+                  htmlH2(
+                    children = list(htmlDiv(id = "total_movies1")),
+                    style = list(display="flex", position = "absolute", top = 80, left = 102, textAlign = "center", color = "#000000")
+                  )
+                )
+              )
+            )
+          ),
+          htmlDiv(
+            dbcRow(
+              list(
+                htmlStrong(
+                  htmlDiv(
+                    "Total Actors",
+                    style = list(fontSize = 20, display="flex", position = "absolute", top = 50, left = 430, textAlign = "center", color = "#000000")
+                  )
+                ),
+                htmlDiv(
+                  htmlH2(
+                    children = list(htmlDiv(id = "total_actors1")),
+                    style = list(display="flex", position = "absolute", top = 80, left = 430, textAlign = "center", color = "#000000")
+                  )
+                )
+              )
+            )
+          ),
+          htmlDiv(
+            dbcRow(
+              list(
+                htmlStrong(
+                  htmlDiv(
+                    "Average Runtime",
+                    style = list(fontSize = 20, display="flex", position = "absolute", top = 50, right = 415, textAlign = "center", color = "#000000")
+                  )
+                ),
+                htmlDiv(
+                  dbcCol(
+                    htmlH2(
+                      children = list(htmlDiv(id = "avg_runtime1")),
+                      style = list(display="flex", position = "absolute", top = 80, right = 450, textAlign = "center", color = "#000000")
+                    ),
+                    htmlDiv(
+                      "mins",
+                      style = list(fontSize = 20, display="inline", color = "#000000")
+                    ) 
+                  )
+                )
+              )
+            )
+          ),
+          htmlDiv(
+            dbcRow(
+              list(
+                htmlStrong(
+                  htmlDiv(
+                    "Average Rating",
+                    style = list(fontSize = 20, display="flex", position = "absolute", top = 50, right = 95, textAlign = "center", color = "#000000")
+                  )
+                ),
+                htmlDiv(
+                  htmlH2(
+                    children = list(htmlDiv(id = "avg_rating1")),
+                    style = list(display="flex", position = "absolute", top = 80, right = 125, textAlign = "center", color = "#000000")
+                  )
+                )
+              )
+            )
+          )
+        ),
+        style = list(width = "100%", position = "relative", background = "#DBA506", borderTop = "3px solid gold")
       ),
       htmlDiv(
         dbcRow(
@@ -187,7 +257,7 @@ app %>% set_layout(
                                 children = list(
                                   htmlDiv(id = "avg_runtime", style = list(display="inline")),
                                   htmlDiv("mins", style = list(fontSize = 20, display="inline"))
-                                  ),
+                                ),
                                 style = list(width = "100%", textAlign = "center", background = "#000000", color = "#F2DB83", border = "1px solid gold")
                               )
                             ),
@@ -217,29 +287,27 @@ app %>% set_layout(
                           )
                         ),
                         # boxplot
-                            dccLoading(
-                                id = "loading-2",
-                                children = list(
-                                    dccGraph(
-                                        id = "boxplot"
-                                    )
-                                ),
-                                type = "circle",
-                                style = list(width = "100%")
-                            ),####
                         htmlDiv(
-                          htmlH2(
-                            children = list(htmlDiv(id = "box_plot", style = list(display="inline"))),
-                            style = list(width = "100%", background = "#DBA506")
-                          )
+                          dccLoading(
+                            id = "loading-2",
+                            children = list(
+                              dccGraph(
+                                id = "boxplot",
+                                figure = list(layout = list(height = 333))
+                              )
+                            ),
+                            type = "circle",
+                            style = list(width = "100%")
+                          ),
+                          style = list(width = "100%", border = "1px solid gold")
                         )
                       ),
                       width = 5
                     ),
                     dbcCol(
                       list(
-                        dbcRow(
-                            list(
+                        # dbcRow(
+                        #   list(
                             htmlStrong(
                               htmlDiv(
                                 "Average rating by Genre over Time",
@@ -247,40 +315,53 @@ app %>% set_layout(
                               ),
                             ),
                             # Line chart
-                            dccLoading(
+                            htmlDiv(
+                              dccLoading(
                                 id = "loading-line",
                                 children = list(
-                                    dccGraph(
-                                        id = "line"
-                                    )
+                                  dccGraph(
+                                    id = "line",
+                                    figure = list(layout = list(height = 300))
+                                  )
                                 ),
                                 type = "circle",
                                 style = list(width = "100%")
+                              ),
+                              style = list(width = "100%", border = "1px solid gold", marginBottom = 10)
                             ),
-                            dbcRow(list(
-                                htmlH6("Select y-axis: ",
-                                       style = list(
-                                           width = "120px", color = "#000000", font_weight = "bold", background = "#DBA506"
-                                       )),
-                                dccRadioItems(
-                                    id = 'ycol',
-                                    # BUG: none of this styling actually works
-                                    style = list(width = "300px", height = "20px"),
-                                    inputStyle = list(margin_right = "10px", margin_left = "10px"),
-                                    inline = TRUE,
-                                    options = list(
+                            dbcRow(
+                              list(
+                                dbcCol(
+                                  list(
+                                    htmlStrong(
+                                      htmlDiv(
+                                        "Select y-axis:",
+                                        style = list(width = "110px", color = "#000000", font_weight = "bold", background = "#DBA506")
+                                      )
+                                    )
+                                  )
+                                ),
+                                dbcCol(
+                                  list(
+                                    dccRadioItems(
+                                      id = 'ycol',
+                                      # BUG: none of this styling actually works
+                                      style = list(width = "300px", height = "20px"),
+                                      inputStyle = list(marginLeft = "10px"),
+                                      inline = TRUE,
+                                      options = list(
                                         list(label = "Average Rating", value = "averageRating"),
-                                        list(label = "Average Runtime", value = "runtimeMinutes")), 
-                                    value='averageRating')
-                            )),
-                            htmlDiv(
-                              htmlH2(
-                                children = list(htmlDiv(id = "total_movies3", style = list(display="inline"))),
-                                style = list(width = "100%", background = "#DBA506")
+                                        list(label = "Average Runtime", value = "runtimeMinutes")
+                                      ),
+                                      value='averageRating'
+                                    )    
+                                  )
+                                )
+                                
                               )
                             )
-                        )
-                        )
+                        #   )
+                        # )
                       ),
                       width = 5
                     ) 
@@ -313,7 +394,8 @@ app %>% set_layout(
                                   id = "loading-1",
                                   children = list(
                                     dccGraph(
-                                      id = "plot-area"
+                                      id = "plot-area",
+                                      figure = list(layout = list(height = 350))
                                     )
                                   ),
                                   type = "circle",
@@ -347,7 +429,7 @@ app %>% set_layout(
                                   children = list(
                                     dccGraph(
                                       id = "map",
-                                      figure = list(layout = list(height = 400))
+                                      figure = list(layout = list(height = 350))
                                     )
                                   ),
                                   type = "circle",
@@ -409,37 +491,49 @@ app$callback(
       summarise(rating = mean(averageRating)) %>% 
       arrange(desc(rating)) %>% 
       head(top_n)
-      
+    
     p <- ggplot(
-        data = actors,
-        aes(x = rating,
-            y = reorder(primaryName, rating))) +
+      data = actors,
+      aes(x = rating,
+          y = reorder(primaryName, rating))) +
       geom_col(fill = "#DBA506") +
       geom_text(aes(label = rating),
                 nudge_x = -1,
                 colour = "black") +
-      labs(x = "Average Movie Rating",
+      labs(x = "",
            y = "") +
       ggthemes::scale_color_tableau()
-      
+    
     p <- p + theme(panel.background = element_rect(fill = "black"),
                    plot.background = element_rect(fill = "black"),
                    panel.border = element_blank(),
                    panel.grid.major = element_blank(),
                    panel.grid.minor = element_blank(),
-                   axis.line = element_line(size = 0.5,
+                   axis.text.x = element_blank(),
+                   axis.text.y = element_text(colour = "#DBA506"),
+                   axis.title.x = element_blank(),
+                   axis.ticks.x = element_blank(),
+                   axis.line.x = element_blank(),
+                   axis.line.y = element_line(size = 0.5,
                                             linetype = "solid",
-                                            colour = "white"),
-                   axis.text = element_text(colour = "#DBA506"),
-                   axis.title = element_text(colour = "#DBA506") 
-                  )
-      ggplotly(p)
+                                            colour = "white")
+    )
+    ggplotly(p)
   }
 )
 
 # KPI: Total Movies
 app$callback(
   output("total_movies", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    n_distinct(df$primaryTitle, na.rm = TRUE)
+  }
+)
+
+app$callback(
+  output("total_movies1", "children"),
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
@@ -457,9 +551,27 @@ app$callback(
   }
 )
 
+app$callback(
+  output("total_actors1", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    n_distinct(df$primaryName, na.rm = FALSE)
+  }
+)
+
 # KPI: Average Runtime
 app$callback(
   output("avg_runtime", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    round(mean(df$runtimeMinutes, na.rm = TRUE), 0)
+  }
+)
+
+app$callback(
+  output("avg_runtime1", "children"),
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
@@ -476,7 +588,16 @@ app$callback(
     round(mean(df$averageRating, na.rm = TRUE), 1)
   }
 )
-      
+
+app$callback(
+  output("avg_rating1", "children"),
+  list(input("filtered_data", "data")),
+  function(data) {
+    df <- jsonlite::fromJSON(data)
+    round(mean(df$averageRating, na.rm = TRUE), 1)
+  }
+)
+
 # Boxplot Callback
 app$callback(
   output("boxplot", "figure"),
@@ -486,13 +607,13 @@ app$callback(
     df <- df %>%
       select(primaryTitle, averageRating, genres) %>%
       distinct()
- 
+    
     p <- ggplot(df) +
-        aes(x = genres,
-            y = averageRating,
-            color = genres) +
-        geom_boxplot() +
-        labs(x = "Genre", y = "IMDb rating")
+      aes(x = genres,
+          y = averageRating,
+          fill = genres) +
+      geom_boxplot(color = "#DBA506") +
+      labs(x = "", y = "IMDb rating")
     
     p <- p + theme(panel.background = element_rect(fill = "black"),
                    plot.background = element_rect(fill = "black"),
@@ -505,60 +626,61 @@ app$callback(
                                             linetype = "solid",
                                             colour = "white"),
                    axis.text = element_text(colour = "#DBA506"),
+                   axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
                    axis.title = element_text(colour = "#DBA506")
-                  )
+    )
     ggplotly(p)
-}
+  }
 )
 
 # Line plot
 app$callback(
-    output('line', 'figure'),
-    list(input("filtered_data", "data"),
-        input('ycol', 'value')),
-    function(data, ycol) {
-        df <- jsonlite::fromJSON(data)
-        ylab <- ""
-        if(ycol == "averageRating") {
-            ylab <- "Average Rating (/10)"
-        } else if(ycol == "runtimeMinutes") {
-            ylab <- "Average Runtime (minutes)"
-        }
-            
-        df$startYear <- as.Date(paste(df$startYear, 1, 1, sep = "-"))
-        # Calculate the mean Y per genre per year
-        # this has to be done outside ggplot for the tooltip to work
-        df <- df %>%
-            group_by(genres, startYear) %>%
-            summarize(meanY = mean(!!sym(ycol), na.rm = TRUE)) %>%
-            merge(df)
+  output('line', 'figure'),
+  list(input("filtered_data", "data"),
+       input('ycol', 'value')),
+  function(data, ycol) {
+    df <- jsonlite::fromJSON(data)
+    ylab <- ""
+    if(ycol == "averageRating") {
+      ylab <- "Average Rating (/10)"
+    } else if(ycol == "runtimeMinutes") {
+      ylab <- "Average Runtime (minutes)"
+    }
     
-        p <- ggplot(df) +
-            aes(x = startYear,
-                y = meanY,
-                color = genres,
-                text = meanY) +  # TODO: improve me but there's ggplot bugs
-            geom_line() +
-            labs(x = "Year", y = ylab) +
-            scale_x_date(date_labels = "%Y")
+    df$startYear <- as.Date(paste(df$startYear, 1, 1, sep = "-"))
+    # Calculate the mean Y per genre per year
+    # this has to be done outside ggplot for the tooltip to work
+    df <- df %>%
+      group_by(genres, startYear) %>%
+      summarize(meanY = mean(!!sym(ycol), na.rm = TRUE)) %>%
+      merge(df)
     
-        p <- p + theme(panel.background = element_rect(fill = "black"),
-                       plot.background = element_rect(fill = "black"),
-                       legend.background = element_rect(fill = "black"),
-                       legend.text = element_text(colour = "#DBA506"),
-                       panel.border = element_blank(),
-                       panel.grid.major = element_line(color = "#444444"),
-                       panel.grid.minor = element_line(color = "#444444"),
-                       axis.line = element_line(size = 0.5,
-                                                linetype = "solid",
-                                                colour = "white"),
-                       axis.text = element_text(colour = "#DBA506"),
-                       axis.title = element_text(colour = "#DBA506"),
-                       legend.position = c(0.5, 0.5))
+    p <- ggplot(df) +
+      aes(x = startYear,
+          y = meanY,
+          color = genres,
+          text = meanY) +  # TODO: improve me but there's ggplot bugs
+      geom_line() +
+      labs(x = "", y = ylab) +
+      scale_x_date(date_labels = "%Y")
     
-        ggplotly(p, tooltip = "text") %>%
-            layout(legend = list(orientation = "h", y = -0.15))  # Return
-}
+    p <- p + theme(panel.background = element_rect(fill = "black"),
+                   plot.background = element_rect(fill = "black"),
+                   legend.background = element_rect(fill = "black"),
+                   legend.text = element_text(colour = "#DBA506"),
+                   panel.border = element_blank(),
+                   panel.grid.major = element_line(color = "#444444"),
+                   panel.grid.minor = element_line(color = "#444444"),
+                   axis.line = element_line(size = 0.5,
+                                            linetype = "solid",
+                                            colour = "white"),
+                   axis.text = element_text(colour = "#DBA506"),
+                   axis.title = element_text(colour = "#DBA506"),
+                   legend.position = c(0.5, 0.5))
+    
+    ggplotly(p, tooltip = "text") %>%
+      layout(legend = list(orientation = "h", y = -0.15))  # Return
+  }
 )
 
 # Map
@@ -598,20 +720,20 @@ app$callback(
               showocean = TRUE,
               oceancolor = toRGB("black"),
               showscale = FALSE
-              )
+    )
     
     # Plotly map object
     p <- plot_geo(map_data) %>%
-         add_trace(z = ~averageRating,
-                   text = ~hover,
-                   locations = ~alpha_3,
-                   colors = toRGB("#DBA506"),
-                   color = ~fill,
-                   type = 'choropleth',
-                   showscale = FALSE
-                   ) %>%
-         layout(geo = g,
-                paper_bgcolor = toRGB("black"))
+      add_trace(z = ~averageRating,
+                text = ~hover,
+                locations = ~alpha_3,
+                colors = toRGB("#DBA506"),
+                color = ~fill,
+                type = 'choropleth',
+                showscale = FALSE
+      ) %>%
+      layout(geo = g,
+             paper_bgcolor = toRGB("black"))
     
     return(p)
   }
