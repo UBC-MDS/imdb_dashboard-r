@@ -1,12 +1,8 @@
 library(dash)
 library(dashHtmlComponents)
 library(dplyr)
-library(plotly)
+library(plotly) 
 library(jsonlite)
-
-source("bar_chart.R")
-source("boxplot.R")
-source("line_chart.R")
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
 
@@ -372,9 +368,38 @@ app$callback(
   list(input("filtered_data", "data"),
        input("top_n", "value")),
   function(data, top_n) {
-    df <- jsonlite::fromJSON(data)
-    figure <- generate_bar_chart(df, top_n)
-    figure
+    data <- jsonlite::fromJSON(data)
+    actors <- data %>%
+      select(averageRating, primaryName) %>% 
+      group_by(primaryName) %>% 
+      summarise(rating = mean(averageRating)) %>% 
+      arrange(desc(rating)) %>% 
+      head(top_n)
+      
+    p <- ggplot(
+        data = actors,
+        aes(x = rating,
+            y = reorder(primaryName, rating))) +
+      geom_col(fill = "#DBA506") +
+      geom_text(aes(label = rating),
+                nudge_x = -1,
+                colour = "black") +
+      labs(x = "Average Movie Rating",
+           y = "") +
+      ggthemes::scale_color_tableau()
+      
+    p <- p + theme(panel.background = element_rect(fill = "black"),
+                   plot.background = element_rect(fill = "black"),
+                   panel.border = element_blank(),
+                   panel.grid.major = element_blank(),
+                   panel.grid.minor = element_blank(),
+                   axis.line = element_line(size = 0.5,
+                                            linetype = "solid",
+                                            colour = "white"),
+                   axis.text = element_text(colour = "#DBA506"),
+                   axis.title = element_text(colour = "#DBA506") 
+                  )
+      ggplotly(p)
   }
 )
 
@@ -424,9 +449,32 @@ app$callback(
   list(input("filtered_data", "data")),
   function(data) {
     df <- jsonlite::fromJSON(data)
-    figure <- generate_boxplot(df)
-    figure
-  }
+    df <- df %>%
+      select(primaryTitle, averageRating, genres) %>%
+      distinct()
+ 
+    p <- ggplot(df) +
+        aes(x = genres,
+            y = averageRating,
+            color = genres) +
+        geom_boxplot() +
+        labs(x = "Genre", y = "IMDb rating")
+    
+    p <- p + theme(panel.background = element_rect(fill = "black"),
+                   plot.background = element_rect(fill = "black"),
+                   legend.background = element_rect(fill = "black"),
+                   legend.text = element_text(colour = "#DBA506"),
+                   panel.border = element_blank(),
+                   panel.grid.major = element_line(color = "#444444"),
+                   panel.grid.minor = element_line(color = "#444444"),
+                   axis.line = element_line(size = 0.5,
+                                            linetype = "solid",
+                                            colour = "white"),
+                   axis.text = element_text(colour = "#DBA506"),
+                   axis.title = element_text(colour = "#DBA506")
+                  )
+    ggplotly(p)
+}
 )
 
 # Line plot
@@ -436,9 +484,47 @@ app$callback(
         input('ycol', 'value')),
     function(data, ycol) {
         df <- jsonlite::fromJSON(data)
-        figure <- generate_line_chart(df, ycol)
-        figure
-    }
+        ylab <- ""
+        if(ycol == "averageRating") {
+            ylab <- "Average Rating (/10)"
+        } else if(ycol == "runtimeMinutes") {
+            ylab <- "Average Runtime (minutes)"
+        }
+            
+        df$startYear <- as.Date(paste(df$startYear, 1, 1, sep = "-"))
+        # Calculate the mean Y per genre per year
+        # this has to be done outside ggplot for the tooltip to work
+        df <- df %>%
+            group_by(genres, startYear) %>%
+            summarize(meanY = mean(!!sym(ycol), na.rm = TRUE)) %>%
+            merge(df)
+    
+        p <- ggplot(df) +
+            aes(x = startYear,
+                y = meanY,
+                color = genres,
+                text = meanY) +  # TODO: improve me but there's ggplot bugs
+            geom_line() +
+            labs(x = "Year", y = ylab) +
+            scale_x_date(date_labels = "%Y")
+    
+        p <- p + theme(panel.background = element_rect(fill = "black"),
+                       plot.background = element_rect(fill = "black"),
+                       legend.background = element_rect(fill = "black"),
+                       legend.text = element_text(colour = "#DBA506"),
+                       panel.border = element_blank(),
+                       panel.grid.major = element_line(color = "#444444"),
+                       panel.grid.minor = element_line(color = "#444444"),
+                       axis.line = element_line(size = 0.5,
+                                                linetype = "solid",
+                                                colour = "white"),
+                       axis.text = element_text(colour = "#DBA506"),
+                       axis.title = element_text(colour = "#DBA506"),
+                       legend.position = c(0.5, 0.5))
+    
+        ggplotly(p, tooltip = "text") %>%
+            layout(legend = list(orientation = "h", y = -0.15))  # Return
+}
 )
-
+      
 app$run_server(Debug=T)
