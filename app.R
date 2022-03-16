@@ -1,7 +1,7 @@
 library(dash)
 library(dashHtmlComponents)
 library(dplyr)
-library(plotly)
+library(plotly) 
 library(jsonlite)
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
@@ -527,4 +527,4 @@ app$callback(
 }
 )
       
-app$run_server(Debug=T)
+app$run_server(host = '0.0.0.0')
