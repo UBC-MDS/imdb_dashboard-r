@@ -326,6 +326,40 @@ app %>% set_layout(
                         )  
                       ),
                       width = 4
+                    ),
+                    # Map
+                    dbcCol(
+                      list(
+                        dbcRow(
+                          list(
+                            # Map Title
+                            htmlStrong(
+                              htmlDiv(
+                                "Top rated movie in each Region",
+                                style = list(width = "100%", textAlign = "center", background = "#DBA506", color = "#000000") 
+                              )
+                            ),
+                            # Map Plot
+                            dbcCol(
+                              htmlDiv(
+                                dccLoading(
+                                  id = "loading-map",
+                                  children = list(
+                                    dccGraph(
+                                      id = "map",
+                                      figure = list(layout = list(height = 400))
+                                    )
+                                  ),
+                                  type = "circle",
+                                  style = list(width = "100%")
+                                ),
+                                style = list(width = "100%", border = "1px solid gold")
+                              ) 
+                            )
+                          )
+                        )
+                      ),
+                      width = 8
                     )
                   )
                 )
@@ -526,5 +560,61 @@ app$callback(
             layout(legend = list(orientation = "h", y = -0.15))  # Return
 }
 )
-      
-app$run_server(host = '0.0.0.0')
+
+# Map
+app$callback(
+  output("map", "figure"),
+  list(input("filtered_data", "data")),
+  function(data){
+    # Read JSON data and country code information, merge to form consolidated data
+    map_data <- jsonlite::fromJSON(data)
+    country_codes <- read.csv("data/country_codes.csv")
+    map_data <- merge(map_data, country_codes, by.x = "region", by.y = "alpha_2", all.x = TRUE)
+    
+    # Data wrangling
+    map_data <- map_data %>%
+      subset(region != "") %>%
+      group_by(alpha_3) %>%
+      arrange(desc(averageRating)) %>%
+      select(primaryTitle, alpha_3, averageRating, name) %>%
+      distinct()
+    
+    # Add custom tooltip to show title
+    map_data$hover <- with(map_data, paste("Country:", name, "<br>", "Title:", primaryTitle))
+    
+    # Fill same color for all countries
+    map_data$fill <- 1
+    
+    # Remove duplicate data to have 1 row by country
+    map_data <- map_data[!duplicated(map_data$alpha_3),]
+    
+    # Map layout list
+    g <- list(scope = "world",
+              # projection = list(type = 'natural earth'),
+              showcountries = TRUE,
+              countrycolor = toRGB("#F2DB83"),
+              showland = TRUE,
+              landcolor = toRGB("grey22"),
+              showocean = TRUE,
+              oceancolor = toRGB("black"),
+              showscale = FALSE
+              )
+    
+    # Plotly map object
+    p <- plot_geo(map_data) %>%
+         add_trace(z = ~averageRating,
+                   text = ~hover,
+                   locations = ~alpha_3,
+                   colors = toRGB("#DBA506"),
+                   color = ~fill,
+                   type = 'choropleth',
+                   showscale = FALSE
+                   ) %>%
+         layout(geo = g,
+                paper_bgcolor = toRGB("black"))
+    
+    return(p)
+  }
+)
+
+app$run_server(Debug=T)
