@@ -1,7 +1,9 @@
 library(dash)
 library(dashHtmlComponents)
-library(tidyverse)
+library(ggplot2)
+library(dplyr)
 library(plotly)
+library(readr)
 library(jsonlite)
 
 app <- Dash$new(external_stylesheets = dbcThemes$CYBORG)
