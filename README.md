@@ -12,6 +12,20 @@ Usage examples:
 
 <img src="dashboard_features.gif" width="100%" />
 
+### Running the app locally
+
+To download the contents of this GitHub page on to your local machine follow these steps:
+
+1. Copy and paste the following link: git clone https://github.com/UBC-MDS/imdb_dashboard-r.git to your Terminal.
+
+2. On your terminal, type: cd imdb_dashboard-r.
+
+3. To run an app instance locally, first install the dependencies by typing: Rscript init.R
+
+4. Launch app.R by typing: Rscript app.R
+
+5. Using any modern web browser, visit http://127.0.0.1:8050/ to access the app.
+
 ## Dashboard description
 
 Our dashboard consists of one web page that shows overall summary and 4 main reactive plots:
